@@ -1,44 +1,49 @@
 import { Form } from "antd";
 import { PlusOutlined } from '@ant-design/icons';
-import { Upload, Button, message } from 'antd';
+import { Upload, Button, Input,message, Card } from 'antd';
 import { useState } from 'react';
 import { createFile } from "../api/fileupload";
 import { useNavigate } from "react-router-dom";
-
+import { Col, Row } from 'antd';
+  
  const CreateFile =()=>{
-   
-   const history = useNavigate();
+  const [defaultFileList, setDefaultFileList] = useState([]);
+  const [fileName, setFileName] = useState();
+  const navigate = useNavigate();
+   const handleOnChange = ({ fileList}) => {
+    setDefaultFileList(fileList);
+  };
    const submitForm = async (formData) => {
+    console.log(formData);
+    var myfile = await getBase64(defaultFileList[0].originFileObj);
+    var filename = defaultFileList[0].fileName;
     
-       var data = null;
-       createFile(data)
+    var newdata = {
+      filename: filename,
+      filecontent: myfile
+    };   
+    createFile(newdata)
         .then(() => {
-        console.log("added file");
+          navigate('/')
         })
         .catch((e) => {
          console.log(`${e?.data?.message}`, "error");
-        })
-      
+        })   
     };
 
-   const beforeUpload = (file) => {
-      const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-      // if (!isJpgOrPng) {
-      //   message.error('You can only upload JPG/PNG file!');
-      // }
-       const isLt2M = file.size / 1024 / 1024 < 10;
-      // if (!isLt2M) {
-      //   message.error('Image must smaller than 2MB!');
-      // }
-      return true && isLt2M;
+    function getBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+      });
+    }
+    const uploadImage = async (options) => {
+      const { onSuccess } = options;
+  
+      onSuccess('OK');
     };
-
-    const getBase64 = (img, callback) => {
-      const reader = new FileReader();
-      reader.addEventListener('load', () => callback(reader.result));
-      reader.readAsDataURL(img);
-    };
-
     const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState();
     const handleChange = (info) => {
@@ -48,59 +53,47 @@ import { useNavigate } from "react-router-dom";
       }
       if (info.file.status === 'done') {
         // Get this url from response in real world.
+        setFileName(info.file.fileName);
         getBase64(info.file.originFileObj, (url) => {
           setLoading(false);
           setImageUrl(url);
         });
       }
     };
-    const uploadButton = (
-      <div>
-        {loading ? <></> : <PlusOutlined />}
-        <div
-          style={{
-            marginTop: 8,
-          }}
-        >
-          Upload
-        </div>
-      </div>
-    );
+
    return(
     <>
-    <div>create </div>
+     <Row>
+      <Col span={8}></Col>
+      <Col span={8}>
+     <Card style={{marginTop: "250px"}}>
+
+     </Card>
      <Form
-       className="w-full overflow-auto"
+       className="w-full overflow-auto my-10"
        layout="vertical"
        name="form"
        onFinish={submitForm}
      >
      <Form.Item
-       label= "Upload File"
-       name="newfile"
+      
+       name="filename"
      >
-            <Upload
-        name="avatar"
-        listType="picture-card"
-        className="avatar-uploader"
-        showUploadList={false}
-        action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-        beforeUpload={beforeUpload}
-        onChange={handleChange}
-      >
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt="avatar"
-            style={{
-              width: '100%',
-            }}
-          />
-        ) : (
-          uploadButton
-        )}
-      </Upload>
+           <Upload
+                      accept="application/pdf"
+                      customRequest={uploadImage}
+                      onChange={handleOnChange}
+                      listType="picture-card"
+                      defaultFileList={defaultFileList}
+                      className="image-upload-grid"
+                    >
+                      {defaultFileList.length >= 1 ? null : (
+                        <div>Upload Your File</div>
+                      )}
+                    </Upload>
+    
       </Form.Item> 
+
       <Button
                   type="primary"
                   size="large"
@@ -110,6 +103,10 @@ import { useNavigate } from "react-router-dom";
                  Upload File
                 </Button>
      </Form>
+     </Col>
+     <Col span={8}></Col>
+    </Row>
+     
     </>
    )   
 }

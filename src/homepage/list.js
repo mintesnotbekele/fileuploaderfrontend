@@ -1,8 +1,15 @@
 import { Table , Card} from 'antd';
 import { useNavigate } from 'react-router-dom';
+
+import  { DeleteOutlined } from '@ant-design/icons';
 import { useState , useEffect} from 'react';
 import { getFiles, deleteFile } from "../api/fileupload.js";
+
 const ListFile =()=>{   
+  const deleteItem=(index)=>{
+    deleteFile(index);
+  }
+ 
   const navigate = useNavigate();
   const [files, setFiles] = useState([]);
   useEffect(()=>{
@@ -33,9 +40,19 @@ const ListFile =()=>{
             },
             {
                 title: 'Uploaded Date',
-                dataIndex: 'uploadeddate',
-                key: 'uploadeddate',
+                dataIndex: 'createdAt',
+                key: 'createdAt',
               },
+            {
+              title: 'Action',
+              key: 'action',
+              render: (index) => ( 
+                <span>
+                  <DeleteOutlined onClick={()=> deleteItem(index.id)}/>
+                </span>
+              ),
+              
+            }
           
     ] 
     return(

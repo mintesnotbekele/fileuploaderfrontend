@@ -1,5 +1,6 @@
 import { httpService } from "../helpers/api-helper";
 import { FileUploadEndPoint } from "./fileupload.endpoints";
+import axios from "axios";
 export const getFiles = (data) => {
   return httpService
     .get(`${FileUploadEndPoint.getFiles}`, { params: data })
@@ -9,8 +10,9 @@ export const getFiles = (data) => {
 };
 
 export const createFile = (params) => {
-  return httpService
-    .post(`${FileUploadEndPoint.addFile}`, params)
+  return axios.
+    post(`http://localhost:3001/api/v1/file/createFile`, 
+    params)
     .then((response) => {
       return response;
     });
