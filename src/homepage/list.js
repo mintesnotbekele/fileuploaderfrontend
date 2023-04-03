@@ -7,6 +7,7 @@ import { getFiles, deleteFile } from "../api/fileupload.js";
 
 const ListFile =()=>{   
   const deleteItem=(index)=>{
+    window.location.reload(false);
     deleteFile(index);
   }
  
@@ -35,8 +36,8 @@ const ListFile =()=>{
             },
             {
               title: 'File Size',
-              dataIndex: 'filesize',
-              key: 'filesize',
+              dataIndex: 'fileSize',
+              key: 'fileSize',
             },
             {
                 title: 'Uploaded Date',

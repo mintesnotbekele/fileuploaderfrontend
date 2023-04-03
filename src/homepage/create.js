@@ -8,20 +8,23 @@ import { Col, Row } from 'antd';
   
  const CreateFile =()=>{
   const [defaultFileList, setDefaultFileList] = useState([]);
-  const [fileName, setFileName] = useState();
+ 
+
   const navigate = useNavigate();
    const handleOnChange = ({ fileList}) => {
     setDefaultFileList(fileList);
   };
    const submitForm = async (formData) => {
-    console.log(formData);
-    var myfile = await getBase64(defaultFileList[0].originFileObj);
-    var filename = defaultFileList[0].fileName;
     
+    var myfile = await getBase64(defaultFileList[0].originFileObj);
+    var filename = defaultFileList[0].name;
+    var fileSize = defaultFileList[0].size;
     var newdata = {
       filename: filename,
-      filecontent: myfile
+      filecontent: myfile,
+      fileSize: fileSize,
     };   
+    console.log(filename);
     createFile(newdata)
         .then(() => {
           navigate('/')
@@ -53,7 +56,8 @@ import { Col, Row } from 'antd';
       }
       if (info.file.status === 'done') {
         // Get this url from response in real world.
-        setFileName(info.file.fileName);
+     
+         
         getBase64(info.file.originFileObj, (url) => {
           setLoading(false);
           setImageUrl(url);
